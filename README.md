@@ -8,3 +8,21 @@ The goal is to create a fast and personal search tool to that assists in locatin
 search through each file.
 
 # Data Structure Implemented
+The main structure of the project is an inverted index, as previously stated. This stores the words as keys and a list of documents where those words appear.
+Some search results would look like the following example below.
+
+Example:
+
+"algorithm" -> [notes1.txt, lecture2.md, coding_sample.txt]
+
+"project" -> [notes1.txt, ProjectIdeas.txt, final_version.md]
+
+An inverted index reverses the relationship between documents and texts. This means that instead of storing documents and reading them to find a mtach, the program 
+builds a lookup table where each word points to the files that contain it. Once the index is created, searching becomes quick and efficient even as the number of files grows.
+During indexing, text is tokenized, converted to lowercase, and punctuation removed. 
+The results can be displayed in various ways, but my implementation will be ranked by word frequency.
+
+
+# How To Run
+
+# Example
