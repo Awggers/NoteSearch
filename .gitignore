@@ -1,0 +1,24 @@
+#Build Folders
+/build/
+out/
+cmake-build-*/
+
+#CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+#Executables
+*.exe
+*.out
+*.obj
+
+#VSCode
+.vscode/
+.idea/
+*.user
+
+#OS
+.DS_Store
+Thumbs.db
