@@ -8,9 +8,7 @@
 /*
 Class purpose:
 queries inverted index that is created by Indexer.
-Allows searching for a single word and returns file paths.
-
-This will be expanded:
+Allows searching for multiple word and returns file paths.
 */
 
 
@@ -20,12 +18,14 @@ public:
 
     explicit SearchEngine(const Index& idx);
 
-    //Single word search
-    std::vector<std::string> search(const std::string& word) const;
+    //Search for one or more words
+    std::vector<std::string> search(const std::string& query) const;
 
 private:
     const Index& index;
-
+    
+    // Split query string into lowercase word tokens 
+    std::vector<std::string> tokenize(const std::string& text) const;
 };
 
 #endif
