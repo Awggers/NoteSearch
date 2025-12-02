@@ -78,7 +78,7 @@ Search for a word(s) - is case sensitive
 - total score = sum of frequencies across all terms. Results are highest to lowest
 */
 
-std::vector<std::string> SearchEngine::search(const std::string& query) const {
+std::vector<std::pair<std::string, int>> SearchEngine::search(const std::string& query) const {
     
     // Break the query into lowercase words
     std::vector<std::string> words = tokenize(query);
@@ -86,6 +86,7 @@ std::vector<std::string> SearchEngine::search(const std::string& query) const {
     if (words.empty()) {
         return {};
     }
+
     // filePath map is total score:
     std::unordered_map<std::string, int> totalScores;
     
@@ -99,11 +100,11 @@ std::vector<std::string> SearchEngine::search(const std::string& query) const {
         std::unordered_map<std::string, int> filesForTerm = getFilesForTerm(w);
 
         // If a term has no match, no results returned
-        if (filesForTerm.empty()){
+        if (filesForTerm.empty()) {
             return {};
         }
 
-        for (const auto& fileCountPair : filesForTerm){
+        for (const auto& fileCountPair : filesForTerm) {
             const std::string& filePath = fileCountPair.first;
             int count = fileCountPair.second;
 
@@ -116,12 +117,12 @@ std::vector<std::string> SearchEngine::search(const std::string& query) const {
     std::vector<std::pair<std::string, int>> ranked;
     ranked.reserve(totalScores.size());
 
-    for (const auto& scorePair : totalScores){
+    for (const auto& scorePair : totalScores) {
         const std::string& filePath = scorePair.first;
         int score = scorePair.second;
 
         auto it = termMatchCounts.find(filePath);
-        if (it != termMatchCounts.end() && it->second == numTerms){
+        if (it != termMatchCounts.end() && it->second == numTerms) {
             ranked.emplace_back(filePath, score);
         }
     }
@@ -132,17 +133,11 @@ std::vector<std::string> SearchEngine::search(const std::string& query) const {
 
     // Sort score by descending and tie breaks by filePath alphabetically
     std::sort(ranked.begin(), ranked.end(), [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
-        if (a.second != b.second){
-            return a.second > b.second; // highest score first
-        }
-        return a.first < b.first; // alphabetical tie-breaker
-    });
+                  if (a.second != b.second) {
+                      return a.second > b.second; // highest score first
+                  }
+                  return a.first < b.first; // alphabetical tie-break
+              });
 
-    std::vector<std::string> results;
-    results.reserve(ranked.size());
-    for (const auto& p : ranked){
-        results.push_back(p.first);
-    }
-
-    return results;
+    return ranked;
 }

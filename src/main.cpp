@@ -52,8 +52,10 @@ int main(){
             cout << "No results found. \n";
         } else {
             cout << "Found in " << results.size() << " file(s):\n";
-            for (const auto& path : results) {
-                cout << " - " << path << "\n";
+            for (const auto& result : results) {
+                const string& path = result.first;
+                int score = result.second;
+                cout << " - " << path << "  (score: " << score << ")\n";
             }
         }
     }

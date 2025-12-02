@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <utility>
 
 /*
 Class purpose:
@@ -19,7 +20,7 @@ public:
     explicit SearchEngine(const Index& idx);
 
     //Search for one or more words
-    std::vector<std::string> search(const std::string& query) const;
+    std::vector<std::pair<std::string, int>> search(const std::string& query) const;
 
 private:
     const Index& index;
