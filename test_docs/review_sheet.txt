@@ -1,0 +1,4 @@
+Binary trees allow structured searching but require balancing for optimal performance.
+Graphs allow modeling flexible connections like dependencies or communication.
+Hash tables provide constant-time lookup for most insertion and search operations.
+Data structure choice influences memory usage, runtime efficiency, and scalability.

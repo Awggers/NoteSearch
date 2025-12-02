@@ -1,0 +1,4 @@
+Binary search trees support insertion, searching, and deletion in logarithmic time when balanced.
+Graphs can represent relationships like road networks, social connections, or program dependencies.
+Hash maps store key-value pairs and allow constant time average search complexity.
+Efficient searching depends heavily on using the correct underlying data structure.

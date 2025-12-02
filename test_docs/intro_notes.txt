@@ -1,0 +1,4 @@
+Data structures organize information so it can be searched and processed efficiently.
+Trees and graphs are two common structures used in computer science.
+A binary tree stores values in a hierarchical pattern which allows fast searching.
+Hash tables allow constant time lookup when keys are distributed well.
