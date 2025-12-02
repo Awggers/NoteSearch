@@ -61,24 +61,19 @@ void Indexer::processFile(const std::string& filePath){
     std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
     //Tokenize into lowercase words
-    auto words = tokenize(content);
+    std::vector<std::string> words = tokenize(content);
 
     // Store words in the index
     for (const auto& word : words){
-        auto& files = index[word];
-
-        //Avoid duplicates for the same file path
-        if (files.empty() || files.back() != filePath) {
-            files.push_back(filePath);
-        }
+        index[word][filePath] += 1;
     }
 }
 
-    /* 
-    Converts raw text to lowercase alphabetic words.
-    Non-alphanumeric characters are treated as boundaries.
-    ? ! @ # $ % ^ & * , . are all examples of non-alphanumeric characters
-    */
+/* 
+Converts raw text to lowercase alphabetic words.
+Non-alphanumeric characters are treated as boundaries.
+? ! @ # $ % ^ & * , . are all examples of non-alphanumeric characters
+*/
 
 std::vector<std::string> Indexer::tokenize(const std::string& text){
     std::vector<std::string> tokens;

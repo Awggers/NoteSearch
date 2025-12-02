@@ -1,8 +1,11 @@
 #include "SearchEngine.h"
+
 #include <cctype>
 #include <unordered_map>
 #include <unordered_set>
-
+#include <vector>
+#include <string>
+#include <algorithm>
 
 // Reference to built index no copy necessary
 
@@ -38,27 +41,28 @@ Single term search:
     Example: 'table' will be matched to 'tables', 'hashtable' and so on.
 */
 
+std::unordered_map<std::string, int> SearchEngine::getFilesForTerm(const std::string& term) const {
 
-std::vector<std::string> SearchEngine::getFilesForTerm(const std::string& term) const {
+    std::unordered_map<std::string, int> result;
+
     // Try exact match first
     auto it = index.find(term);
     if (it != index.end()) {
-        return it->second;
+
+        result = it->second;
+        return result;
     }
 
     // Exact match does not exist: fall back to partial
-    std::vector<std::string> result;
-    std::unordered_set<std::string> seenFiles;
-
     for (const auto& kv : index) {
         const std::string& word = kv.first;
-        const std::vector<std::string>& files = kv.second;
+        const std::unordered_map<std::string, int>& fileFreqs = kv.second;
 
         if (word.find(term) != std::string::npos) { // substring match
-            for (const auto& file : files) {
-                if (seenFiles.insert(file).second) {
-                    result.push_back(file);
-                }
+            for (const auto& fileCountPair : fileFreqs){
+                const std::string& filePath = fileCountPair.first;
+                int count = fileCountPair.second;
+                result[filePath] += count;
             }
         }
     }
@@ -71,6 +75,7 @@ std::vector<std::string> SearchEngine::getFilesForTerm(const std::string& term) 
 Search for a word(s) - is case sensitive
 - one word search behaves as simple lookup
 - multi-word search acts as an AND search. Returns only files that contain all words
+- total score = sum of frequencies across all terms. Results are highest to lowest
 */
 
 std::vector<std::string> SearchEngine::search(const std::string& query) const {
@@ -81,45 +86,62 @@ std::vector<std::string> SearchEngine::search(const std::string& query) const {
     if (words.empty()) {
         return {};
     }
+    // filePath map is total score:
+    std::unordered_map<std::string, int> totalScores;
+    
+    // filePath map of how many terms the file matched
+    std::unordered_map<std::string, int> termMatchCounts;
 
-    // Single-word search
-    if (words.size() == 1) {
-        return getFilesForTerm(words[0]);
-    }
-
-    // Multi-word AND search:
-    // Count in how many query terms each file appears.
-    std::unordered_map<std::string, int> fileCounts;
     int numTerms = static_cast<int>(words.size());
 
-    for (const auto& w : words) {
-        std::vector<std::string> filesForTerm = getFilesForTerm(w);
+    for (const auto& w : words){
+        // Each term, get files and term specific frequencies
+        std::unordered_map<std::string, int> filesForTerm = getFilesForTerm(w);
 
-        // If a term matches nothing (exact or partial), no file can satisfy the whole query
-        if (filesForTerm.empty()) {
+        // If a term has no match, no results returned
+        if (filesForTerm.empty()){
             return {};
         }
 
-        std::unordered_set<std::string> seenThisTerm;
+        for (const auto& fileCountPair : filesForTerm){
+            const std::string& filePath = fileCountPair.first;
+            int count = fileCountPair.second;
 
-        for (const auto& filePath : filesForTerm) {
-            if (seenThisTerm.insert(filePath).second) {
-                fileCounts[filePath] += 1;
-            }
+            totalScores[filePath] += count;
+            termMatchCounts[filePath] += 1;
         }
     }
 
-    // Only files that contain all query terms
-    std::vector<std::string> results;
-    results.reserve(fileCounts.size());
+    // Files that matched ALL terms
+    std::vector<std::pair<std::string, int>> ranked;
+    ranked.reserve(totalScores.size());
 
-    for (const auto& kv : fileCounts) {
-        const std::string& filePath = kv.first;
-        int count = kv.second;
+    for (const auto& scorePair : totalScores){
+        const std::string& filePath = scorePair.first;
+        int score = scorePair.second;
 
-        if (count == numTerms) {
-            results.push_back(filePath);
+        auto it = termMatchCounts.find(filePath);
+        if (it != termMatchCounts.end() && it->second == numTerms){
+            ranked.emplace_back(filePath, score);
         }
+    }
+
+    if (ranked.empty()){
+        return {};
+    }
+
+    // Sort score by descending and tie breaks by filePath alphabetically
+    std::sort(ranked.begin(), ranked.end(), [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
+        if (a.second != b.second){
+            return a.second > b.second; // highest score first
+        }
+        return a.first < b.first; // alphabetical tie-breaker
+    });
+
+    std::vector<std::string> results;
+    results.reserve(ranked.size());
+    for (const auto& p : ranked){
+        results.push_back(p.first);
     }
 
     return results;

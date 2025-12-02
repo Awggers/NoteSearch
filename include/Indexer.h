@@ -17,7 +17,7 @@ Class purpose:
 class Indexer {
 public:
     // defines the word as a key and value is a list of paths
-    using Index = std::unordered_map<std::string, std::vector<std::string>>;
+    using Index = std::unordered_map<std::string, std::unordered_map<std::string, int>>;
 
     Indexer() = default;
 
