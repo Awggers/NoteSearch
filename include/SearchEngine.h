@@ -24,8 +24,13 @@ public:
 private:
     const Index& index;
     
-    // Split query string into lowercase word tokens 
+    // Split query string into lowercase word tokens
+
     std::vector<std::string> tokenize(const std::string& text) const;
+
+    // The preference is exact matches but
+    // if no exact match exists, return files for substrings instead
+    std::vector<std::string> getFilesForTerm(const std::string& term) const;
 };
 
 #endif

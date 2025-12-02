@@ -28,16 +28,24 @@ void Indexer::buildIndex(const std::string& directoryPath){
         // Loop through files in directory
         for (const auto& entry : fs::directory_iterator(directoryPath)){
 
+            if (!entry.is_regular_file()){
+                continue;
+            }
+
+            //Get file extension as a string
+            std::string ext = entry.path().extension().string();
+
             // Process regular .txt files
-            if (entry.is_regular_file() && entry.path().extension() == ".txt"){
+            if (ext == ".txt" || ext == ".md"){
                 processFile(entry.path().string());
             }
         }
 
-        } catch (const std::exception& e) {
-            std::cerr << "Error while indexing directory: " << e.what() << "\n";
+    } catch (const std::exception& e) {
+        std::cerr << "Error while indexing directory: " << e.what() << "\n";
         }
-    }
+}
+
 
     // Read file contents and updates index with extracted words
 

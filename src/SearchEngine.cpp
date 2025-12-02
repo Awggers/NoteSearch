@@ -8,28 +8,63 @@
 
 SearchEngine::SearchEngine(const Index& idx) : index(idx){}
 
-std::vector<std::string> SearchEngine::tokenize(const std::string& text) const{
+std::vector<std::string> SearchEngine::tokenize(const std::string& text) const {
     std::vector<std::string> tokens;
     std::string current;
 
     for (char c : text) {
         unsigned char uc = static_cast<unsigned char>(c);
 
-        if (std::isalnum(uc)){
+        if (std::isalnum(uc)) {
             current += static_cast<char>(std::tolower(uc));
-        } else if (!current.empty()){
+        } else if (!current.empty()) {
             tokens.push_back(current);
             current.clear();
         }
     }
 
-    if (!current.empty()){
+    if (!current.empty()) {
         tokens.push_back(current);
     }
-    
+
     return tokens;
 }
 
+
+/*
+Single term search:
+- Try exact word match first
+- If no exact match, fall back to substring against keys
+    Example: 'table' will be matched to 'tables', 'hashtable' and so on.
+*/
+
+
+std::vector<std::string> SearchEngine::getFilesForTerm(const std::string& term) const {
+    // Try exact match first
+    auto it = index.find(term);
+    if (it != index.end()) {
+        return it->second;
+    }
+
+    // Exact match does not exist: fall back to partial
+    std::vector<std::string> result;
+    std::unordered_set<std::string> seenFiles;
+
+    for (const auto& kv : index) {
+        const std::string& word = kv.first;
+        const std::vector<std::string>& files = kv.second;
+
+        if (word.find(term) != std::string::npos) { // substring match
+            for (const auto& file : files) {
+                if (seenFiles.insert(file).second) {
+                    result.push_back(file);
+                }
+            }
+        }
+    }
+
+    return result;
+}
 
 
 /* 
@@ -38,56 +73,51 @@ Search for a word(s) - is case sensitive
 - multi-word search acts as an AND search. Returns only files that contain all words
 */
 
-std::vector<std::string> SearchEngine::search(const std::string& query) const{
-
-    // Break query into clean lowercase words
-    auto words = tokenize(query);
+std::vector<std::string> SearchEngine::search(const std::string& query) const {
+    
+    // Break the query into lowercase words
+    std::vector<std::string> words = tokenize(query);
 
     if (words.empty()) {
         return {};
     }
 
-    //Single word search
-    if (words.size() == 1){
-        const std::string& w = words[0];
-        auto it = index.find(w);
-        if (it != index.end()){
-            return it->second;
-        }
-        return {};
+    // Single-word search
+    if (words.size() == 1) {
+        return getFilesForTerm(words[0]);
     }
 
-    // Multi word search and count how many files they appear in.
-
+    // Multi-word AND search:
+    // Count in how many query terms each file appears.
     std::unordered_map<std::string, int> fileCounts;
-
     int numTerms = static_cast<int>(words.size());
 
-    for (const auto& w : words){
-        auto it = index.find(w);
-        if (it == index.end()){
-            
+    for (const auto& w : words) {
+        std::vector<std::string> filesForTerm = getFilesForTerm(w);
+
+        // If a term matches nothing (exact or partial), no file can satisfy the whole query
+        if (filesForTerm.empty()) {
             return {};
         }
 
-        const auto& filesForWord = it->second;
+        std::unordered_set<std::string> seenThisTerm;
 
-        // Avoid counting same file twice for the same word
-        std::unordered_set<std::string> seenThisWord;
-
-        for (const auto& filePath : filesForWord){
-            if (seenThisWord.insert(filePath).second){
+        for (const auto& filePath : filesForTerm) {
+            if (seenThisTerm.insert(filePath).second) {
                 fileCounts[filePath] += 1;
             }
         }
     }
 
-    // Only files that contain all query words
+    // Only files that contain all query terms
     std::vector<std::string> results;
     results.reserve(fileCounts.size());
 
-    for (const auto& [filePath, count] : fileCounts){
-        if (count == numTerms){
+    for (const auto& kv : fileCounts) {
+        const std::string& filePath = kv.first;
+        int count = kv.second;
+
+        if (count == numTerms) {
             results.push_back(filePath);
         }
     }
