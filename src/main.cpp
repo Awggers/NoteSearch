@@ -6,12 +6,20 @@
 
 using namespace std; // clean up code in this section
 
+/*
+Main loop purpose
+- Ask user for directory to be indexed
+- Attempt to auto-detect a directory if necessary <- this will come later
+- Build inverted index
+- Allow repeate searches until exit
+*/
+
 int main(){
     Indexer indexer;
 
     // Ask user for folder path to notes
     string folderPath;
-    cout << "Enter directory path to index (example: data): ";
+    cout << "Enter directory path to index (example: data): " /*<< "Leave blank to auto-detect: "*/;
     getline(cin, folderPath);
 
     cout << "Building index ... \n";
