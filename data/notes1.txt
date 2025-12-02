@@ -1,1 +1,11 @@
-The evolution of body shape is thought to be tightly coupled to changes in regulatory sequences, but specific molecular events associated with major morphological transitions in vertebrates have remained elusive. We identified snake-specific sequence changes within an otherwise highly conserved long-range limb enhancer of Sonic hedgehog (Shh). Transgenic mouse reporter assays revealed that the in vivo activity pattern of the enhancer is conserved across a wide range of vertebrates, including fish, but not in snakes. Genomic substitution of the mouse enhancer with its human or fish ortholog results in normal limb development. In contrast, replacement with snake orthologs caused severe limb reduction. Synthetic restoration of a single transcription factor binding site lost in the snake lineage reinstated full in vivo function to the snake enhancer. Our results demonstrate changes in a regulatory sequence associated with a major body plan transition and highlight the role of enhancers in morphological evolution.
+The evolution of body shape is thought to be tightly coupled to changes in regulatory sequences, but specific molecular 
+events associated with major morphological transitions in vertebrates have remained elusive. 
+We identified snake-specific sequence changes within an otherwise highly conserved long-range limb enhancer of Sonic hedgehog (Shh). 
+Transgenic mouse reporter assays revealed that the in vivo activity pattern of the enhancer is conserved across 
+a wide range of vertebrates, including fish, but not in snakes. 
+Genomic substitution of the mouse enhancer with its human or fish ortholog results in normal limb development. 
+In contrast, replacement with snake orthologs caused severe limb reduction. 
+Synthetic restoration of a single transcription factor binding site lost in the snake lineage reinstated 
+full in vivo function to the snake enhancer. 
+Our results demonstrate changes in a regulatory sequence associated with a major body plan transition and 
+highlight the role of enhancers in morphological evolution.clear
