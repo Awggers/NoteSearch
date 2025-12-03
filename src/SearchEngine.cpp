@@ -13,6 +13,7 @@
 
 SearchEngine::SearchEngine(const Index& idx) : index(idx){}
 
+// Tokenize text into lowercase words
 std::vector<std::string> SearchEngine::tokenize(const std::string& text) const {
     std::vector<std::string> tokens;
     std::string current;
@@ -44,24 +45,32 @@ Single term search:
 */
 
 std::unordered_map<std::string, int> SearchEngine::getFilesForTerm(const std::string& term) const {
-
     std::unordered_map<std::string, int> result;
 
-    // Try exact match first
+    // 1. Adds exact match if existing
     auto it = index.find(term);
     if (it != index.end()) {
-
-        result = it->second;
-        return result;
+        const std::unordered_map<std::string, int>& fileFreqs = it->second;
+        for (const auto& fileCountPair : fileFreqs) {
+            const std::string& filePath = fileCountPair.first;
+            int count = fileCountPair.second;
+            result[filePath] += count;
+        }
     }
 
-    // Exact match does not exist: fall back to partial
+    // 2. Add partial matches
     for (const auto& kv : index) {
         const std::string& word = kv.first;
+
+        // Avoid double-counting exact matches
+        if (word == term) {
+            continue;
+        }
+
         const std::unordered_map<std::string, int>& fileFreqs = kv.second;
 
-        if (word.find(term) != std::string::npos) { // substring match
-            for (const auto& fileCountPair : fileFreqs){
+        if (word.find(term) != std::string::npos) {
+            for (const auto& fileCountPair : fileFreqs) {
                 const std::string& filePath = fileCountPair.first;
                 int count = fileCountPair.second;
                 result[filePath] += count;
@@ -90,24 +99,24 @@ std::string SearchEngine::extractSnippet(const std::string& filePath, const std:
     std::string lowerContent = content;
     std::string lowerWord = searchWord;
 
-    std::transform(lowerContent.begin(), lowerContent.end(), lowerContent.begin(), [](unsigned char c) {return std::tolower(c);});
-    std::transform(lowerWord.begin(), lowerWord.end(), lowerWord.begin(), [](unsigned char c) {return std::tolower(c);});
+    std::transform(lowerContent.begin(), lowerContent.end(), lowerContent.begin(), [](unsigned char c){ return std::tolower(c); });
+    std::transform(lowerWord.begin(), lowerWord.end(), lowerWord.begin(), [](unsigned char c){ return std::tolower(c); });
 
     // Find the term
-    size_t pos = lowerContent.find(lowerWord);
-    if (pos == std::string::npos){
+    std::size_t pos = lowerContent.find(lowerWord);
+    if (pos == std::string::npos) {
         return "(no preview available)";
     }
 
     // Snippet window settings
-    int window = 60; // 60 characters long snippets
-    size_t start = (pos > window) ? pos - window : 0;
-    size_t end = std::min(pos + lowerWord.length() + window, content.size());
+    int window = 60; //60 Character long snippets, this can be adjusted up or down
+    std::size_t start = (pos > static_cast<std::size_t>(window)) ? pos - window : 0;
+    std::size_t end = std::min(pos + lowerWord.length() + window, content.size());
 
     std::string snippet = content.substr(start, end - start);
 
     // Replaces new lines with spaces
-    for (char& c : snippet){
+    for (char& c : snippet) {
         if (c == '\n' || c == '\r') c = ' ';
     }
 
@@ -115,18 +124,16 @@ std::string SearchEngine::extractSnippet(const std::string& filePath, const std:
 
 }
 
+/*
+Given full query, pick first token and create the snippet for the word in file
+*/
 
-// Use tokenize and extractSnippet internally
-
-std::string SearchEngine::getSnippet(const std::string& filePath,
-                                     const std::string& query) const
-{
+std::string SearchEngine::getSnippet(const std::string& filePath, const std::string& query) const{
     std::vector<std::string> words = tokenize(query);
-    if (words.empty()) {
+    if (words.empty()){
         return "";
     }
 
-    // Use the first search term for snippet context
     return extractSnippet(filePath, words[0]);
 }
 
@@ -155,6 +162,7 @@ std::vector<std::pair<std::string, int>> SearchEngine::search(const std::string&
     int numTerms = static_cast<int>(words.size());
 
     for (const auto& w : words){
+        
         // Each term, get files and term specific frequencies
         std::unordered_map<std::string, int> filesForTerm = getFilesForTerm(w);
 

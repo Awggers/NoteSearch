@@ -45,7 +45,7 @@ int main(){
             break;
         }
 
-        // Perform lookup
+        // Perform lookup, getSnippet implemented here
         auto results = engine.search(query);
 
         if (results.empty()) {
@@ -58,7 +58,6 @@ int main(){
                 int score = result.second;
                 cout << " - " << path << "  (score: " << score << ")\n";
                 
-                // initially implement calling on private classes, modified to use different public call
                 string snippet = engine.getSnippet(path, query);
                 if (!snippet.empty()){
                     cout << "  " << snippet << "\n";
