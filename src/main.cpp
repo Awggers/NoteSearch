@@ -49,16 +49,24 @@ int main(){
         auto results = engine.search(query);
 
         if (results.empty()) {
-            cout << "No results found. \n";
+            cout << "No results found.\n";
         } else {
             cout << "Found in " << results.size() << " file(s):\n";
+
             for (const auto& result : results) {
                 const string& path = result.first;
                 int score = result.second;
                 cout << " - " << path << "  (score: " << score << ")\n";
+                
+                // initially implement calling on private classes, modified to use different public call
+                string snippet = engine.getSnippet(path, query);
+                if (!snippet.empty()){
+                    cout << "  " << snippet << "\n";
+                }
             }
         }
     }
+
     
     return 0;
 }

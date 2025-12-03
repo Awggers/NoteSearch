@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 // Reference to built index no copy necessary
 
@@ -70,6 +72,63 @@ std::unordered_map<std::string, int> SearchEngine::getFilesForTerm(const std::st
     return result;
 }
 
+
+/*
+Return snippet showing the first occurence of searchWord in file
+*/
+
+std::string SearchEngine::extractSnippet(const std::string& filePath, const std::string& searchWord) const{
+    std::ifstream file(filePath);
+    if (!file.is_open()){
+        return "(could not read file)";
+    }
+
+    //Load text file
+    std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    // Convert content and searchWord to lowercase
+    std::string lowerContent = content;
+    std::string lowerWord = searchWord;
+
+    std::transform(lowerContent.begin(), lowerContent.end(), lowerContent.begin(), [](unsigned char c) {return std::tolower(c);});
+    std::transform(lowerWord.begin(), lowerWord.end(), lowerWord.begin(), [](unsigned char c) {return std::tolower(c);});
+
+    // Find the term
+    size_t pos = lowerContent.find(lowerWord);
+    if (pos == std::string::npos){
+        return "(no preview available)";
+    }
+
+    // Snippet window settings
+    int window = 60; // 60 characters long snippets
+    size_t start = (pos > window) ? pos - window : 0;
+    size_t end = std::min(pos + lowerWord.length() + window, content.size());
+
+    std::string snippet = content.substr(start, end - start);
+
+    // Replaces new lines with spaces
+    for (char& c : snippet){
+        if (c == '\n' || c == '\r') c = ' ';
+    }
+
+    return "... " + snippet + " ...";
+
+}
+
+
+// Use tokenize and extractSnippet internally
+
+std::string SearchEngine::getSnippet(const std::string& filePath,
+                                     const std::string& query) const
+{
+    std::vector<std::string> words = tokenize(query);
+    if (words.empty()) {
+        return "";
+    }
+
+    // Use the first search term for snippet context
+    return extractSnippet(filePath, words[0]);
+}
 
 /* 
 Search for a word(s) - is case sensitive

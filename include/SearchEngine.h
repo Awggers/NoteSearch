@@ -22,6 +22,8 @@ public:
     //Search for one or more words
     std::vector<std::pair<std::string, int>> search(const std::string& query) const;
 
+    std::string getSnippet(const std::string& filePath, const std::string& query) const;
+
 private:
     const Index& index;
     
@@ -32,6 +34,9 @@ private:
     // The preference is exact matches but
     // if no exact match exists, return files for substrings instead
     std::unordered_map<std::string, int> getFilesForTerm(const std::string& term) const;
+
+    // Snippet Extraction
+    std::string extractSnippet(const std::string& filePath, const std::string& searchWord) const;
 };
 
 #endif
