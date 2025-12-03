@@ -57,6 +57,6 @@ Usage:
 
 # Example Output
 
-![alt text](image-1.png)
+![Preview of a search](image-1.png)
 
 Results are sorted by score that shows how often the query terms appeared in each file. This snippet provides a preview of where the word occurs in the file.
