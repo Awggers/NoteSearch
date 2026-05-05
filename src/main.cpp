@@ -11,7 +11,7 @@ Main loop purpose
 - Ask user for directory to be indexed
 - Attempt to auto-detect a directory if necessary <- this will come later
 - Build inverted index
-- Allow repeate searches until exit
+- Allow repeat searches until exit
 */
 
 int main(){
