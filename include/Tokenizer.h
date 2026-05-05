@@ -12,7 +12,7 @@ Non-alphanumeric characters act as word boundaries.
 Used by Indexer and SearchEngine to ensure consistency.
 */
 
-inline std::vector<std:string> tokenize(const std::string& text) {
+inline std::vector<std::string> tokenize(const std::string& text) {
     std::vector<std::string> tokens;
     std::string current;
 
