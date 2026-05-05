@@ -53,7 +53,7 @@ void Indexer::processFile(const std::string& filePath){
     std::ifstream file(filePath);
 
     if (!file.is_open()) {
-        std::cerr << "Could not open file: " << "\n";
+        std::cerr << "Could not open file: " << filePath << "\n";
         return;
     }
 
