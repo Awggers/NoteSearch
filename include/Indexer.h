@@ -31,9 +31,6 @@ private:
     Index index;
 
     void processFile(const std::string& filePath);
-    
-    // turns raw text into lowercase tokens 
-    std::vector<std::string> tokenize(const std::string& text);
 };
 
 #endif
