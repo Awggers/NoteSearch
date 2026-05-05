@@ -68,36 +68,3 @@ void Indexer::processFile(const std::string& filePath){
         index[word][filePath] += 1;
     }
 }
-
-/* 
-Converts raw text to lowercase alphabetic words.
-Non-alphanumeric characters are treated as boundaries.
-? ! @ # $ % ^ & * , . are all examples of non-alphanumeric characters
-*/
-
-std::vector<std::string> Indexer::tokenize(const std::string& text){
-    std::vector<std::string> tokens;
-    std::string current;
-
-    for (char c : text) {
-        unsigned char uc = static_cast<unsigned char>(c);
-
-        //Build current word from alphanumeric characters
-        if (std::isalnum(uc)) {
-            current += static_cast<char>(std::tolower(uc));
-        } 
-
-        //End of word push and reset
-        else if (!current.empty()){
-            tokens.push_back(current);
-            current.clear();
-        }
-    }
-
-    //Add last word if it exists
-    if (!current.empty()){
-        tokens.push_back(current);
-    }
-
-    return tokens;
-}

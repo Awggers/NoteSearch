@@ -1,6 +1,5 @@
 #include "SearchEngine.h"
-
-#include <cctype>
+#include "Tokenizer.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -12,31 +11,6 @@
 // Reference to built index no copy necessary
 
 SearchEngine::SearchEngine(const Index& idx) : index(idx){}
-
-// Tokenize text into lowercase words
-std::vector<std::string> SearchEngine::tokenize(const std::string& text) const {
-    std::vector<std::string> tokens;
-    std::string current;
-
-    for (char c : text) {
-        unsigned char uc = static_cast<unsigned char>(c);
-
-        if (std::isalnum(uc)) {
-            current += static_cast<char>(std::tolower(uc));
-        } else if (!current.empty()) {
-            tokens.push_back(current);
-            current.clear();
-        }
-    }
-
-    if (!current.empty()) {
-        tokens.push_back(current);
-    }
-
-    return tokens;
-}
-
-
 /*
 Single term search:
 - Try exact word match first
