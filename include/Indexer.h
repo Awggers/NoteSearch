@@ -31,6 +31,7 @@ private:
     Index index;
 
     void processFile(const std::string& filePath);
+    void processDocx(const std::string& filePath);
 };
 
 #endif

@@ -1,5 +1,7 @@
 #include "Indexer.h"
 #include "Tokenizer.h"
+#include "DocxParser.h"
+
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
@@ -38,7 +40,10 @@ void Indexer::buildIndex(const std::string& directoryPath){
             // Process regular .txt files
             if (ext == ".txt" || ext == ".md"){
                 processFile(entry.path().string());
+            } else if (ext ==".docx") {
+                processDocx(entry.path().string());
             }
+
         }
 
     } catch (const std::exception& e) {
@@ -65,6 +70,21 @@ void Indexer::processFile(const std::string& filePath){
 
     // Store words in the index
     for (const auto& word : words){
+        index[word][filePath] += 1;
+    }
+}
+
+void Indexer::processDocx(const std::string& filePath) {
+    std::string content = extractTextFromDocx(filePath);
+
+    if (content.empty()) {
+        std::cerr << "Could not extract text from: " << filePath << "\n";
+        return;
+    }
+
+    std::vector<std::string> words = tokenize(content);
+
+    for (const auto& word : words) {
         index[word][filePath] += 1;
     }
 }

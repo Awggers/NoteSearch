@@ -12,10 +12,20 @@ qt_add_executable(SearchEngine
     src/mainwindow.ui
     src/Indexer.cpp
     src/SearchEngine.cpp
+    src/DocxParser.cpp
+    src/miniz.c
+    src/pugixml.cpp
+
+    include/DocxParser.h
     include/Indexer.h
     include/SearchEngine.h
     include/Tokenizer.h
+    include/miniz.h
+    include/pugiconfig.hpp
+    include/pugixml.hpp
+
 )
+set_source_files_properties(src/miniz.c PROPERTIES LANGUAGE CXX)
 
 target_include_directories(SearchEngine PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
